@@ -42,6 +42,50 @@ fun power(num: Int, pow: Int): Int{
     return result
 }
 
+// vararg - оператор параметра функции с переменным количеством принимаемых элементов
+// Пример функции с переменным количеством значений параметра
+fun guests(vararg names: String){
+    println("Список гостей: ")
+    for (i in names) println(i)
+}
+
+// Функция расчёта среднего арифметического значения
+fun mean(vararg numbers: Int): Int {
+    var sum = 0
+    for (i in numbers) sum += i
+    return sum / numbers.size
+}
+
+// Функция с разными типами параметров
+fun group(name: String, course: Int, vararg students: String){
+    println("Группа $name, курс $course.")
+    for (i in students) println(i)
+}
+
+fun country(name: String, vararg bigCities: String, capital: String){
+    println("Название страны: $name. Столица: $capital.\nКрупные города:")
+    for (i in bigCities) println(i)
+}
+
+fun sum(vararg numbers: Int): Int{
+    var result = 0
+    for (i in numbers) result += i
+    return result
+}
+
+// Однострочные фукнции
+// Пример однострочной функции
+fun cubed(number: Int) = number * number * number
+
+
+// Анонимные функции
+val greetings = fun () = println("Hello!")
+
+val sum = fun(x: Int, y: Int) = x + y
+
+// Лямбда-выражение
+
+val hello = { println("Hello") }
 
 // main() - точка запуска программы
 fun main(){
@@ -55,5 +99,27 @@ fun main(){
     println(sqr)
     val p = power(10, 8)
     println(p)
+
+    guests("Андрей Вещев", "Иван Иванов", "Райан Гослинг", "Барак Обама", "Дональд Трамп")
+
+    val arithmeticMean = mean(67, 23, 53, 545, 688, 34)
+    println(arithmeticMean)
+
+    group("24/4", 2, "Иван Иванов", "Алексей Алексеев", "Сергей Сергеев")
+
+    country("Россия", "Санкт-Петербург", "Новосибирск", "Екатеринбург", "Казань", capital = "Москва")
+
+    // * перед параметром функции - оператор распаковки массива
+    val arrayNumbers = intArrayOf(1, 2, 3, 3, 2, 1, 5, 6, 7, 7, 6, 5)
+    println(sum(*arrayNumbers))
+
+    val cbd = cubed(4)
+    println(cbd)
+    greetings()
+    println( sum(9, 8))
+
+    hello()
 }
+
+
 
