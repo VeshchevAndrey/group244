@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.Clear
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -30,6 +31,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -54,7 +56,11 @@ class MainActivity : ComponentActivity() {
             val searchState = remember { mutableStateOf(SearchState()) }
 
             val cars = arrayOf(
-                Car(brand = "Volkswagen", model = "Golf 2", cost = 2000, image = R.drawable.golf)
+                Car(brand = "Volkswagen", model = "Golf 2", cost = 2000, image = R.drawable.golf),
+                Car(brand = "BMW", model = "X5", cost = 2800),
+                Car(brand = "Toyota", model = "Corolla", cost = 1800),
+                Car(brand = "Mercedes-Benz", model = "GLA", cost = 2500),
+                Car(brand = "Ford", model = "Focus", cost = 2100),
             )
 
             NavHost(
@@ -62,7 +68,11 @@ class MainActivity : ComponentActivity() {
                 startDestination = "home",
                 modifier = Modifier.fillMaxSize()
             ) {
-                composable("home") { HomeScreen(cars = cars, navController = navController) }
+                composable("home") { HomeScreen(
+                    cars = cars,
+                    navController = navController,
+                    currentState = searchState.value
+                ) }
                 composable("search") { SearchScreen(
                     navController = navController,
                     searchState = searchState,
@@ -73,10 +83,26 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun HomeScreen(cars: Array<Car>, navController: NavController){
+fun HomeScreen(cars: Array<Car>, navController: NavController, currentState: SearchState){
+    val filteredItems = remember {
+        derivedStateOf {
+            cars.filter { car ->
+                val brandMatch = (car.brand.contains(currentState.brandValue, true)) or
+                        (currentState.brandValue.isEmpty())
+                val modelMatch = (car.model.contains(currentState.modelValue, true)) or
+                        (currentState.modelValue.isEmpty())
+                val minCost = currentState.minCost.toDoubleOrNull() ?: 0.0
+                val maxCost = currentState.maxCost.toDoubleOrNull() ?: Double.MAX_VALUE
+                val priceMatch = (car.cost >= minCost) and (car.cost <= maxCost)
+
+                brandMatch and modelMatch and priceMatch
+            }
+        }
+    }
+
     Scaffold(
         topBar = { TopBar(
-            title = "Car list",
+            title = "Car list (${filteredItems.value.size})",
             action = {
                 IconButton(onClick = {navController.navigate("search")}) {
                     Icon(imageVector = Icons.Rounded.Search, contentDescription = "Search")
@@ -85,7 +111,7 @@ fun HomeScreen(cars: Array<Car>, navController: NavController){
         ) }
     ) { innerPadding ->
         LazyColumn(modifier = Modifier.padding(innerPadding)) {
-            items(items = cars) { items ->
+            items(items = filteredItems.value) { items ->
                 SingleItem(items)
             }
         }
@@ -118,13 +144,33 @@ fun SearchScreen(
                 value = searchState.value.brandValue,
                 onValueChange = { searchState.value = searchState.value.copy(brandValue = it)},
                 label = { Text(text = "Brand") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                trailingIcon = {
+                    IconButton(onClick = {
+                        searchState.value = searchState.value.copy(brandValue = "")
+                    }) {
+                        Icon(
+                            imageVector = Icons.Rounded.Clear,
+                            contentDescription = "Clear"
+                        )
+                    }
+                }
             )
             OutlinedTextField(
                 value = searchState.value.modelValue,
                 onValueChange = { searchState.value = searchState.value.copy(modelValue = it) },
                 label = { Text(text = "Model") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                trailingIcon = {
+                    IconButton(onClick = {
+                        searchState.value = searchState.value.copy(modelValue = "")
+                    }) {
+                        Icon(
+                            imageVector = Icons.Rounded.Clear,
+                            contentDescription = "Clear"
+                        )
+                    }
+                }
             )
             Row(modifier = Modifier.fillMaxWidth()) {
                 OutlinedTextField(
@@ -201,5 +247,5 @@ data class Car(
     val brand: String,
     val model: String,
     val cost: Int,
-    val image: Int
+    val image: Int = R.drawable.car_placeholder
 )
