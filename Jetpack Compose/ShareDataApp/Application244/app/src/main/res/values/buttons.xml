@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="row1">
+        <item>C</item>
+        <item>+/-</item>
+        <item>%</item>
+        <item>/</item>
+    </string-array>
+
+    <string-array name="row2">
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>x</item>
+    </string-array>
+
+    <string-array name="row3">
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>-</item>
+    </string-array>
+
+    <string-array name="row4">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>+</item>
+    </string-array>
+
+    <string-array name="row5">
+        <item>0</item>
+        <item>.</item>
+        <item>= </item>
+    </string-array>
+</resources>
